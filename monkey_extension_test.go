@@ -8,6 +8,7 @@ import (
 
 	"reflect"
 
+	"github.com/bouk/monkey"
 	"github.com/pkg/errors"
 )
 
@@ -28,6 +29,10 @@ var _ = Describe("MonkeyExtension", func() {
 
 		JustBeforeEach(func() {
 			res, err = subject.Foo(111)
+		})
+
+		AfterEach(func() {
+			monkey.UnpatchAll()
 		})
 
 		Context("when isn't patched", func() {
@@ -79,6 +84,35 @@ var _ = Describe("MonkeyExtension", func() {
 						Expect(res).To(Equal(333))
 					})
 				})
+
+				Context("when unpatched all", func() {
+					BeforeEach(func() {
+						replacement := func() (int, error) { return 222, errors.New("err") }
+						PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
+						monkey.UnpatchAll()
+					})
+
+					It("should return not patched data", func() {
+						Expect(err).To(Succeed())
+						Expect(res).To(Equal(111))
+					})
+				})
+
+				// Unclear issue with unpatch instance method
+
+				//Context("when unpatched one", func() {
+				//	BeforeEach(func() {
+				//		replacement := func(_ dummy, a int) (int, error) { return 10000 + a, errors.New("err") }
+				//		PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
+				//		//monkey.PatchInstanceMethod(reflect.TypeOf(subject), "Foo", replacement)
+				//		monkey.UnpatchInstanceMethod(reflect.TypeOf(subject), "Foo")
+				//	})
+				//
+				//	It("should return not patched data", func() {
+				//		Expect(err).To(Succeed())
+				//		Expect(res).To(Equal(111))
+				//	})
+				//})
 			})
 
 			Context("when patch is not valid", func() {
