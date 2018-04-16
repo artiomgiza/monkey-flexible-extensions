@@ -1,4 +1,4 @@
-package monkey_flexible_extensions
+package monkeyExtensions
 
 import (
 	. "github.com/onsi/ginkgo"
