@@ -1,2 +1,6 @@
-# monkey-flexible-extentions
-The extention of boulk/monkey that allows make monkey.Patch with only part of (or without) input parameters
+# monkey-flexible-extensions
+The extension of `https://github.com/bouk/monkey` that allows make patch
+ instance methods with only part of (or without) input parameters.
+ Useful if one of the parameters is 'private receiver'...
+
+ TODO: example of usages :)
