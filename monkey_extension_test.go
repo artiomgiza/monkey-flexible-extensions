@@ -45,60 +45,65 @@ var _ = Describe("MonkeyExtension", func() {
 		Context("when is patched", func() {
 
 			Context("when patch is valid", func() {
+				var ret *monkey.PatchGuard
 
 				Context("when replacement func doesn't have params", func() {
 					BeforeEach(func() {
 						replacement := func() (int, error) { return 222, errors.New("err") }
-						PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
-
+						ret = PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
 					})
 
 					It("should return patched data", func() {
 						Expect(err).To(HaveOccurred())
 						Expect(res).To(Equal(222))
+						Expect(ret).To(Not(BeNil()))
 					})
 				})
 
 				Context("when replacement func has 1 params", func() {
 					BeforeEach(func() {
 						replacement := func(_ interface{}, param int) (int, error) { return param * 3, errors.New("err") }
-						PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
-
+						ret = PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
 					})
 
 					It("should return patched data", func() {
 						Expect(err).To(HaveOccurred())
 						Expect(res).To(Equal(333))
+						Expect(ret).To(Not(BeNil()))
 					})
 				})
 
 				Context("when replacement uses passed params", func() {
 					BeforeEach(func() {
 						replacement := func(_ interface{}, param int) (int, error) { return param * 3, errors.New("err") }
-						PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
+						ret = PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
 
 					})
 
 					It("should return patched data", func() {
 						Expect(err).To(HaveOccurred())
 						Expect(res).To(Equal(333))
+						Expect(ret).To(Not(BeNil()))
 					})
 				})
 
 				Context("when unpatched all", func() {
 					BeforeEach(func() {
 						replacement := func() (int, error) { return 222, errors.New("err") }
-						PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
+						ret = PatchInstanceMethodFlexible(reflect.TypeOf(subject), "Foo", replacement)
 						monkey.UnpatchAll()
 					})
 
 					It("should return not patched data", func() {
 						Expect(err).To(Succeed())
 						Expect(res).To(Equal(111))
+						Expect(ret).To(Not(BeNil()))
 					})
 				})
 
-				// Unclear issue with unpatch instance method
+				// Issue with unpatch instance method in base monkey project:
+				// Unmerged fix (23.05.2018):
+				// https://github.com/bouk/monkey/pull/16
 
 				//Context("when unpatched one", func() {
 				//	BeforeEach(func() {

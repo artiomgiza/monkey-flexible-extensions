@@ -7,7 +7,7 @@ import (
 	"github.com/bouk/monkey"
 )
 
-func PatchInstanceMethodFlexible(target reflect.Type, methodName string, replacement interface{}) {
+func PatchInstanceMethodFlexible(target reflect.Type, methodName string, replacement interface{}) *monkey.PatchGuard {
 	m, ok := target.MethodByName(methodName)
 	if !ok {
 		panic(fmt.Sprintf("unknown method %s", methodName))
@@ -28,5 +28,5 @@ func PatchInstanceMethodFlexible(target reflect.Type, methodName string, replace
 		return reflect.ValueOf(replacement).Call(inputsForReplacement)
 	}).Interface()
 
-	monkey.PatchInstanceMethod(target, methodName, replacementWrapper)
+	return monkey.PatchInstanceMethod(target, methodName, replacementWrapper)
 }
